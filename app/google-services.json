@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "819550864724",
+    "firebase_url": "https://agenda-fd748.firebaseio.com",
+    "project_id": "agenda-fd748",
+    "storage_bucket": "agenda-fd748.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:819550864724:android:3e8e9a1ea018ddf8",
+        "android_client_info": {
+          "package_name": "alves.thiago.agenda"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "819550864724-a1dilmueaka75e14a8ojf6m1udaf1jkh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBwO_aWGow2lWYXjUmAQpKg4XR8R_D7CuE"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
