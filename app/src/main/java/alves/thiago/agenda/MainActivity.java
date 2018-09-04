@@ -3,6 +3,7 @@ package alves.thiago.agenda;
 import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Typeface;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -10,10 +11,17 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.CalendarView;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.ads.AdListener;
@@ -43,6 +51,7 @@ import java.util.List;
 import java.util.Map;
 
 import sun.bob.mcalendarview.listeners.OnDateClickListener;
+import sun.bob.mcalendarview.listeners.OnMonthChangeListener;
 import sun.bob.mcalendarview.views.ExpCalendarView;
 import sun.bob.mcalendarview.vo.DateData;
 
@@ -55,12 +64,94 @@ public class MainActivity extends AppCompatActivity {
     Thread StartReceiverData ;
     List cods = new ArrayList<String>();
     InterstitialAd mInterstitialAd;
+    Spinner selectAno;
+    TextView textView;
+    String[] mes;
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu items for use in the action bar
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main_activity_actions, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle presses on the action bar items
+        switch (item.getItemId()) {
+            case R.id.action_search:
+                return true;
+            case R.id.action_compose:
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         calendar =  findViewById(R.id.calendar);
+        textView = findViewById(R.id.textView);
+        selectAno = findViewById(R.id.select);
+
+        mes = new String[] {"Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"};
+
+        Date currentTime = Calendar.getInstance().getTime();
+        textView.setText(mes[currentTime.getMonth()]);
+
+
+        String[] arraySpinner = new String[100];
+
+        for (int i = 10; i != arraySpinner.length; i++){
+            arraySpinner[i-10] = "20"+ (String.valueOf(i));
+
+        }
+
+        selectAno.post(new Runnable() {
+            @Override
+            public void run() {
+                selectAno.setSelection(8);
+            }
+        });
+
+
+        selectAno.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
+        {
+            @Override
+            public void onItemSelected(AdapterView<?> arg0, View arg1, int position, long id) {
+                // TODO Auto-generated method stub
+               // Toast.makeText(getBaseContext(), list.get(position), Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> arg0) {
+                // TODO Auto-generated method stub
+            }
+        });
+
+        calendar.setOnMonthChangeListener(new OnMonthChangeListener() {
+            @Override
+            public void onMonthChange(int year, int month) {
+                textView.setText(mes[month-1]);
+
+            }
+        });
+
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_spinner_item, arraySpinner);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        selectAno.setAdapter(adapter);
+
+
+
+        Typeface face = Typeface.createFromAsset(getAssets(),
+                "fonts/font.ttf");
+        textView.setTypeface(face);
+
 
         MobileAds.initialize(this, "ca-app-pub-4653575622321119~7566354167");
 
