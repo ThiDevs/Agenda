@@ -27,6 +27,7 @@
 
     </sun.bob.mcalendarview.views.ExpCalendarView>
 
+
     <Spinner
         android:id="@+id/select"
         android:layout_width="120dp"
@@ -45,5 +46,13 @@
         android:text="TextView"
         android:textSize="38sp"
         android:textStyle="normal" />
+
+    <com.facebook.login.widget.LoginButton
+        android:id="@+id/login_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_gravity="center_horizontal" />
 
 </RelativeLayout>
