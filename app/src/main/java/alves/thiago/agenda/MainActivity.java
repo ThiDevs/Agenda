@@ -17,11 +17,14 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CalendarView;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -116,8 +119,18 @@ public class MainActivity extends AppCompatActivity {
 
         callbackManager = CallbackManager.Factory.create();
 
-        Random rand = new Random();
+        ViewGroup root = findViewById(R.id.root);
 
+        CardsAdapter Cardsadapter;
+        Cardsadapter = new CardsAdapter(this);
+        List<CardModel> cardsAux = new ArrayList<>();
+        cardsAux.add(new CardModel("IMAGEM", "Churrasco na Casa de Rafa no dia 09/09", "Criador do evento: Lucas","Thiago confirmou!! \n Addison confirmou !!",""));
+
+
+       Cardsadapter.add(cardsAux.get(0));
+
+        ListView lvCards = findViewById(R.id.list);
+        lvCards.setAdapter(Cardsadapter);
 
 
 
