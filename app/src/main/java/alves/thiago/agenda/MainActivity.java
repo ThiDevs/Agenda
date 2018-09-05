@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Environment;
 import android.support.annotation.NonNull;
@@ -60,7 +61,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
+import sun.bob.mcalendarview.MarkStyle;
 import sun.bob.mcalendarview.listeners.OnDateClickListener;
 import sun.bob.mcalendarview.listeners.OnMonthChangeListener;
 import sun.bob.mcalendarview.views.ExpCalendarView;
@@ -79,6 +82,9 @@ public class MainActivity extends AppCompatActivity {
     TextView textView;
     String[] mes;
     CallbackManager callbackManager;
+    String[] arraySpinner;
+    Date currentTime;
+    int color = 0;
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu items for use in the action bar
@@ -110,10 +116,15 @@ public class MainActivity extends AppCompatActivity {
 
         callbackManager = CallbackManager.Factory.create();
 
+        Random rand = new Random();
 
 
-        LoginButton loginButton = (LoginButton) findViewById(R.id.login_button);
+
+
+        LoginButton loginButton = findViewById(R.id.login_button);
         loginButton.setReadPermissions("user_friends");
+
+        //loginButton.callOnClick();
 
         // Callback registration
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
@@ -158,11 +169,11 @@ public class MainActivity extends AppCompatActivity {
 
         mes = new String[] {"Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"};
 
-        Date currentTime = Calendar.getInstance().getTime();
+        currentTime = Calendar.getInstance().getTime();
         textView.setText(mes[currentTime.getMonth()]);
 
 
-        String[] arraySpinner = new String[100];
+        arraySpinner = new String[90];
 
         for (int i = 10; i != arraySpinner.length; i++){
             arraySpinner[i-10] = "20"+ (String.valueOf(i));
@@ -183,6 +194,9 @@ public class MainActivity extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> arg0, View arg1, int position, long id) {
                 // TODO Auto-generated method stub
                // Toast.makeText(getBaseContext(), list.get(position), Toast.LENGTH_SHORT).show();
+                calendar.travelTo(new DateData(Integer.valueOf(arraySpinner[position]), currentTime.getMonth()+1,1));
+                calendar.unMarkDate(Integer.valueOf(arraySpinner[position]), currentTime.getMonth()+1,1);
+
             }
 
             @Override
@@ -255,8 +269,13 @@ public class MainActivity extends AppCompatActivity {
 
 
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+        try{
+            Username = readNoteOnSD("Username.txt");
+        } catch (Exception e){
+            e.printStackTrace();
+            Username = null;
+        }
 
-        Username = readNoteOnSD("Username.txt");
 
         if (Username == null){
             AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
@@ -268,11 +287,16 @@ public class MainActivity extends AppCompatActivity {
                 LinearLayout.LayoutParams.MATCH_PARENT);
             input.setLayoutParams(lp);
             alertDialog.setView(input);
+            Random rnd = new Random();
+            final int color2 = Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256));
+
+
             alertDialog.setPositiveButton("Ok",
                     new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog,int which) {
-                        generateNoteOnSD("Username.txt",input.getText().toString());
+                        generateNoteOnSD("Username.txt",input.getText().toString()+"\n"+color2);
                     Username = input.getText().toString();
+                    color = color2;
                 }
             });
             alertDialog.show();
@@ -319,6 +343,7 @@ public class MainActivity extends AppCompatActivity {
             BufferedReader br = new BufferedReader(reader);
             try {
                 line = br.readLine();
+                color = Integer.valueOf(br.readLine());
                 Toast.makeText(this, "Bem vindo de volta " + line, Toast.LENGTH_SHORT).show();
 
             } catch (Exception e){
@@ -395,6 +420,8 @@ public class MainActivity extends AppCompatActivity {
                         user.put("user",Username);
                         Date currentTime = Calendar.getInstance().getTime();
                         user.put("cod",currentTime);
+                        user.put("color",color);
+
 
 
                         db.collection("users")
@@ -445,7 +472,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void RequestForTime(){
-
         days.clear();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("users")
@@ -460,6 +486,7 @@ public class MainActivity extends AppCompatActivity {
                                 Log.d("Carai", document.getId() + " => " + document.getData().get("dia"));
                                 Log.d("Carai", document.getId() + " => " + document.getData().get("user"));
                                 Log.d("Carai", document.getId() + " => " + document.getData().get("cod"));
+                                Log.d("Carai", document.getId() + " => " + document.getData().get("color"));
 
 
                                 String day = document.getData().get("mes").toString()+document.getData().get("dia").toString();
@@ -484,7 +511,10 @@ public class MainActivity extends AppCompatActivity {
 
                                 Log.d("Carai", days.toString());
 
-                                calendar.markDate( Integer.valueOf(document.getData().get("ano").toString()),  Integer.valueOf(document.getData().get("mes").toString()),  Integer.valueOf(document.getData().get("dia").toString()));
+
+                                calendar.markDate(
+                                        new DateData(Integer.valueOf(document.getData().get("ano").toString()),  Integer.valueOf(document.getData().get("mes").toString()),  Integer.valueOf(document.getData().get("dia").toString())).
+                                                setMarkStyle(new MarkStyle(MarkStyle.BACKGROUND, Integer.valueOf(document.getData().get("color").toString()))));
 
 
                             }
