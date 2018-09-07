@@ -1,0 +1,15 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/Add"
+        android:title=""
+        app:showAsAction="always"
+        android:icon="@drawable/plusbutton"
+        />
+    <item
+        android:id="@+id/Entry"
+        android:title=""
+        app:showAsAction="always"
+        android:icon="@drawable/multipleuserssilhouette"
+        />
+</menu>
