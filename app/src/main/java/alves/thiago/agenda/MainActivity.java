@@ -3,10 +3,12 @@ package alves.thiago.agenda;
 import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -30,6 +32,8 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
+
+import org.apache.commons.io.FileUtils;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -59,61 +63,36 @@ public class MainActivity extends AppCompatActivity {
         cardsAdapter = new CardsAdapter(this);
 
 
-        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
-        try{
-            Username = readNoteOnSD("Username.txt");
-        } catch (Exception e){
+
+
+        int permissionCheck = ContextCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+        if (permissionCheck != PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+        }
+        try {
+            Thread.sleep(5);
+        } catch (InterruptedException e) {
             e.printStackTrace();
-            Username = null;
         }
 
-        if (Username == null){
-            File[] files = null;
-            try {
-                files = readFiles();
-            } catch (Exception e){
-
-            }
-            if (files != null) {
-                for (File file : files) {
-                    try {
-                        file.delete();
-                    } catch (Exception e) {
-
-                    }
-
-                }
-            }
-
-
-            AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
-            alertDialog.setTitle("Seu nome");
-            alertDialog.setMessage("PS: Não tem como mudar depois, bote seu nome mesmo KK");
-            final EditText input = new EditText(MainActivity.this);
-            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.MATCH_PARENT);
-            input.setLayoutParams(lp);
-            alertDialog.setView(input);
-
-
-            alertDialog.setPositiveButton("Ok",
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog,int which) {
-                            generateNoteOnSD("Username.txt",input.getText().toString()+"\n"+"0",0);
-                            Username = input.getText().toString();
-                        }
-                    });
-            alertDialog.show();
-
-
+        try {
+                Verifica1();
+            } catch (Exception e) {
+            e.printStackTrace();
         }
+
+
+
+
 
         lvCards.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
+                setCode(cardsAdapter.getItem(position).getChannel());
                 startActivity(intent);
 
             }});
@@ -131,6 +110,7 @@ public class MainActivity extends AppCompatActivity {
         } catch (Exception e) {
 
         }
+        //
         try {
             FirebaseFirestore db = FirebaseFirestore.getInstance();
             Log.d("Files",file[0].getName());
@@ -140,9 +120,8 @@ public class MainActivity extends AppCompatActivity {
                         .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                             @Override
                             public void onSuccess(DocumentSnapshot documentSnapshot) {
-                                Log.d("Files",documentSnapshot.getData().toString());
                                 List<String> Users = (List<String>) documentSnapshot.get("user");
-                                cardsAdapter.add(new CardModel("Imagem",documentSnapshot.get("nome").toString(),"Criador do grupo " + Users.get(0).toString()," "," "));
+                                cardsAdapter.add(new CardModel("Imagem",documentSnapshot.get("nome").toString(),"Criador do grupo " + Users.get(0).toString(),documentSnapshot.get("time").toString()," "));
 
 
                             }
@@ -159,6 +138,58 @@ public class MainActivity extends AppCompatActivity {
 
         }
 
+    }
+
+    public void Verifica1(){
+
+        try{
+            Username = readNoteOnSD("Username.txt");
+        } catch (Exception e){
+            e.printStackTrace();
+            Username = null;
+        }
+
+        if (Username == null){
+
+
+
+            AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
+            alertDialog.setTitle("Seu nome");
+            alertDialog.setMessage("PS: Não tem como mudar depois, bote seu nome mesmo KK");
+            final EditText input = new EditText(MainActivity.this);
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.MATCH_PARENT);
+            input.setLayoutParams(lp);
+            alertDialog.setView(input);
+            Random rnd = new Random();
+            final int color2 = Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256));
+
+            alertDialog.setPositiveButton("Ok",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog,int which) {
+                            generateNoteOnSD("Username.txt",input.getText().toString()+"\n"+color2,0);
+                            Username = input.getText().toString();
+                        }
+                    });
+            alertDialog.show();
+
+
+        }
+
+
+    }
+    public static void deleteFiles(String path) {
+
+        File file = new File(path);
+
+        if (file.exists()) {
+            String deleteCmd = "rm -r " + path;
+            Runtime runtime = Runtime.getRuntime();
+            try {
+                runtime.exec(deleteCmd);
+            } catch (IOException e) { }
+        }
     }
 
     @Override
@@ -231,7 +262,6 @@ public class MainActivity extends AppCompatActivity {
             alertDialog.show();
         } else if (id == R.id.Entry) {
 
-
             AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
             alertDialog.setTitle("Código do Grupo");
             alertDialog.setMessage("");
@@ -266,14 +296,8 @@ public class MainActivity extends AppCompatActivity {
 
                                             }
                                         });
-
-
-
                                     }
                                 });
-
-
-
                             }
                         } });
 
@@ -286,8 +310,13 @@ public class MainActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-
-
+    static String code;
+    public void setCode(String code2){
+        code = code2;
+    }
+    public static String getCode() {
+        return code;
+    }
 
     public File[] readFiles(){
             String path = Environment.getExternalStorageDirectory().toString() + "/Gruops";
@@ -316,8 +345,6 @@ public class MainActivity extends AppCompatActivity {
                 br.close();
             }
 
-
-
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -333,6 +360,9 @@ public class MainActivity extends AppCompatActivity {
                 root = new File(Environment.getExternalStorageDirectory(), "Notes");
             }
             if (!root.exists()) {
+                root.mkdirs();
+            } else {
+                root.delete();
                 root.mkdirs();
             }
             File gpxfile = new File(root, sFileName);

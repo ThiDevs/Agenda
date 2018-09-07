@@ -151,29 +151,13 @@ public class SelectGroup extends AppCompatActivity {
         Cardsadapter = new CardsAdapter(this);
 
 
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("users")
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                // Log.d("Carai", document.getId() + " => " + document.getData());
-                                // Log.d("Carai", document.getId() + " => " + document.getData().get("mes"));
-                                // Log.d("Carai", document.getId() + " => " + document.getData().get("dia"));
-                                // Log.d("Carai", document.getId() + " => " + document.getData().get("user"));
-                                //Log.d("Carai", document.getId() + " => " + document.getData().get("cod"));
-                                // Log.d("Carai", document.getId() + " => " + document.getData().get("color"));
+
+        calendar.getMarkedDates().getAll().clear();
 
 
-                            }
-                        } else {
-                            Log.w("Carai", "Error getting documents.", task.getException());
-                        }
-                    }
-                });
 
+        final String collectionPathUsers = "users"+MainActivity.getCode();
+        final String collectionPathUsers2 = "datas"+MainActivity.getCode();
 
 
 
@@ -222,7 +206,7 @@ public class SelectGroup extends AppCompatActivity {
                         user.put("time",currentTime);
                         if (Username != null){
 
-                            db.collection("datas").document(data+Username)
+                            db.collection(collectionPathUsers2).document(data+Username)
                                     .set(user)
                                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
@@ -653,7 +637,7 @@ public class SelectGroup extends AppCompatActivity {
 
 
 
-                        db.collection("users")
+                        db.collection("users"+MainActivity.getCode())
                                 .add(user)
                                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                                     @Override
@@ -704,7 +688,7 @@ public class SelectGroup extends AppCompatActivity {
 
         days.clear();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("users")
+        db.collection("users"+MainActivity.getCode())
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -751,7 +735,7 @@ public class SelectGroup extends AppCompatActivity {
         situacaoDays.clear();
 
 
-        db.collection("datas")
+        db.collection("datas"+MainActivity.getCode())
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
