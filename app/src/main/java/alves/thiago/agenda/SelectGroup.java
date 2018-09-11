@@ -78,17 +78,11 @@ import sun.bob.mcalendarview.vo.DateData;
 
 public class SelectGroup extends AppCompatActivity {
 
-    // mCalendarView calendar;
     ExpCalendarView calendar;
     String Username = "";
     Map<String, String > days = new HashMap<>();
     Map<String, Integer > situacaoDays = new HashMap<>();
-
-    /*
-    Uma lista que tenha um map Map<String,Integer >
-     */
     Thread StartReceiverData ;
-    List cods = new ArrayList<String>();
     InterstitialAd mInterstitialAd;
     Spinner selectAno;
     TextView textView;
@@ -120,10 +114,6 @@ public class SelectGroup extends AppCompatActivity {
                 return true;
             case R.id.CriarumGrupo:
 
-
-
-
-
                 return true;
             case R.id.EntrarEmUmGrupo:
                 return true;
@@ -149,17 +139,10 @@ public class SelectGroup extends AppCompatActivity {
         nao = findViewById(R.id.checkBox3);
         lvCards = findViewById(R.id.list);
         Cardsadapter = new CardsAdapter(this);
-
-
-
         calendar.getMarkedDates().getAll().clear();
-
-
 
         final String collectionPathUsers = "users"+MainActivity.getCode();
         final String collectionPathUsers2 = "datas"+MainActivity.getCode();
-
-
 
         FecharCard.setOnClickListener(
                 new View.OnClickListener() {
@@ -202,7 +185,7 @@ public class SelectGroup extends AppCompatActivity {
                         int minuto = Calendar.getInstance().getTime().getMinutes();
                         int segundo = Calendar.getInstance().getTime().getSeconds();
                         String currentTime = String.valueOf(ano)+String.valueOf(mes)+String.valueOf(dia)+String.valueOf(hora)+String.valueOf(minuto)+String.valueOf(segundo);
-                        Log.d("CARAI5", currentTime);
+
                         user.put("time",currentTime);
                         if (Username != null){
 
@@ -239,21 +222,10 @@ public class SelectGroup extends AppCompatActivity {
                     }
                 }
         );
-
-
-
         callbackManager = CallbackManager.Factory.create();
-
         ViewGroup root = findViewById(R.id.root);
-
-
-
         LoginButton loginButton = findViewById(R.id.login_button);
         loginButton.setReadPermissions("user_friends");
-
-        //loginButton.callOnClick();
-
-        // Callback registration
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
@@ -270,10 +242,7 @@ public class SelectGroup extends AppCompatActivity {
                 // App code
             }
         });
-
-
         callbackManager = CallbackManager.Factory.create();
-
         LoginManager.getInstance().registerCallback(callbackManager,
                 new FacebookCallback<LoginResult>() {
                     @Override
@@ -292,39 +261,36 @@ public class SelectGroup extends AppCompatActivity {
                     }
                 });
 
-
-
         mes = new String[] {"Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"};
-
         currentTime = Calendar.getInstance().getTime();
         textView.setText(mes[currentTime.getMonth()]);
         getSupportActionBar().setTitle(mes[currentTime.getMonth()] + " de 2018");
-
-
-        arraySpinner = new String[90];
-
-        for (int i = 10; i != arraySpinner.length; i++){
-            arraySpinner[i-10] = "20"+ (String.valueOf(i));
-
+        List<String> anos = new ArrayList<>();
+        int AuxAnoAtual = 0;
+        final int AnoAtual;
+        for (int i  = 1900; i != 3000; i++){
+            anos.add(String.format("%04d", i));
+            if (i == 2018){
+                AuxAnoAtual = i - 1900;
+            }
         }
+        AnoAtual = AuxAnoAtual;
+        arraySpinner = new String[anos.size()];
+        arraySpinner = anos.toArray(arraySpinner);
 
         selectAno.post(new Runnable() {
             @Override
             public void run() {
-                selectAno.setSelection(8);
+                selectAno.setSelection(AnoAtual);
             }
         });
-
-
         selectAno.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
         {
             @Override
             public void onItemSelected(AdapterView<?> arg0, View arg1, int position, long id) {
                 // TODO Auto-generated method stub
-                // Toast.makeText(getBaseContext(), list.get(position), Toast.LENGTH_SHORT).show();
                 calendar.travelTo(new DateData(Integer.valueOf(arraySpinner[position]), currentTime.getMonth()+1,1));
                 calendar.unMarkDate(Integer.valueOf(arraySpinner[position]), currentTime.getMonth()+1,1);
-
             }
 
             @Override
@@ -341,22 +307,16 @@ public class SelectGroup extends AppCompatActivity {
 
             }
         });
-
-
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_spinner_item, arraySpinner);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         selectAno.setAdapter(adapter);
 
-
-
         Typeface face = Typeface.createFromAsset(getAssets(),
                 "fonts/font.ttf");
         textView.setTypeface(face);
 
-
         MobileAds.initialize(this, "ca-app-pub-4653575622321119~7566354167");
-
         AdView adView = findViewById(R.id.adView);
 
         AdRequest adRequest = new AdRequest.Builder().build();
@@ -365,7 +325,6 @@ public class SelectGroup extends AppCompatActivity {
         mInterstitialAd = new InterstitialAd(this);
         mInterstitialAd.setAdUnitId("ca-app-pub-4653575622321119/2718294116");
         mInterstitialAd.loadAd(new AdRequest.Builder().build());
-
         mInterstitialAd.setAdListener(new AdListener() {
             @Override
             public void onAdClosed() {
@@ -374,9 +333,6 @@ public class SelectGroup extends AppCompatActivity {
             }
 
         });
-
-
-
         StartReceiverData = new Thread(new Runnable() {
             public void run() {
                 while(true){
@@ -390,13 +346,6 @@ public class SelectGroup extends AppCompatActivity {
 
             }});
         StartReceiverData.start();
-        //RequestForTime();
-
-
-
-
-
-
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
         try{
             Username = readNoteOnSD("Username.txt");
@@ -404,8 +353,6 @@ public class SelectGroup extends AppCompatActivity {
             e.printStackTrace();
             Username = null;
         }
-
-
         if (Username == null){
             AlertDialog.Builder alertDialog = new AlertDialog.Builder(SelectGroup.this);
             alertDialog.setTitle("Seu nome");
@@ -418,8 +365,6 @@ public class SelectGroup extends AppCompatActivity {
             alertDialog.setView(input);
             Random rnd = new Random();
             final int color2 = Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256));
-
-
             alertDialog.setPositiveButton("Ok",
                     new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog,int which) {
@@ -429,10 +374,7 @@ public class SelectGroup extends AppCompatActivity {
                         }
                     });
             alertDialog.show();
-
-
         }
-
         calendar.setOnDateClickListener(new OnDateClickListener() {
             @Override
             public void onDateClick(View view, DateData date) {
@@ -440,8 +382,6 @@ public class SelectGroup extends AppCompatActivity {
                 Cardsadapter.clear();
                 Boolean CriaDialog = CheckEvent(date);
                 setDateMark(date);
-
-
                 if (CriaDialog){
                     cardView.setVisibility(View.VISIBLE);
                     lvCards.setVisibility(View.VISIBLE);
@@ -463,9 +403,7 @@ public class SelectGroup extends AppCompatActivity {
                                 } else {
                                     situacao = " não confirmou";
                                 }
-
                                 name += key.split(";")[1] + situacao + "\n";
-
                             }
 
                         }
@@ -473,21 +411,14 @@ public class SelectGroup extends AppCompatActivity {
                         e.printStackTrace();
                         name = "Ninguém confirmou ainda :(";
                     }
-
-
                     cardsAux.add(new CardModel("IMAGEM", days.get(day), "Criador do evento: " + days.get(day+"2"),name,""));
-
                     Cardsadapter.add(cardsAux.get(0));
                     lvCards.setAdapter(Cardsadapter);
-
-
                 } else {
                     cardView.setVisibility(View.INVISIBLE);
                     lvCards.setVisibility(View.INVISIBLE);
                     CreateDialog(date);
                 }
-
-
             }
         });
 
@@ -546,15 +477,12 @@ public class SelectGroup extends AppCompatActivity {
                 line = br.readLine();
                 color = Integer.valueOf(br.readLine());
                 Toast.makeText(this, "Bem vindo de volta " + line, Toast.LENGTH_SHORT).show();
-
             } catch (Exception e){
                 e.printStackTrace();
             }
             finally {
                 br.close();
             }
-
-
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -564,36 +492,17 @@ public class SelectGroup extends AppCompatActivity {
     }
 
     public void CreateDialog(final DateData date){
-
         AlertDialog alerta;
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Eventos neste dia");
         String day = date.getMonth() + Integer.toString(date.getDay());
-        Log.d("Carai", day);
         builder.setMessage(days.get(day));
-        Log.d("Carai", "A MESSAGEM: " + days.toString());
-
-
-
-
-
-//        Log.d("Carai", days.get(day));
-
-
-        builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface arg0, int arg1) {
+        builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {public void onClick(DialogInterface arg0, int arg1) {
             }
         });
         builder.setNeutralButton("Criar novo Evento", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface arg0, int arg1) {
                 CreateNovoEvento(Integer.toString(date.getYear()), (Integer.toString(date.getMonth())), (Integer.toString(date.getDay())));
-
-
-            }
-        });
-        //define um botão como negativo.
-        builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface arg0, int arg1) {
             }
         });
         alerta = builder.create();
@@ -610,14 +519,10 @@ public class SelectGroup extends AppCompatActivity {
                 LinearLayout.LayoutParams.MATCH_PARENT);
         input.setLayoutParams(lp);
         alertDialog.setView(input);
-
-
         alertDialog.setPositiveButton("Ok",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog,int which) {
-
                         FirebaseFirestore db = FirebaseFirestore.getInstance();
-                        // Create a new user with a first and last name
                         Map<String, Object> user = new HashMap<>();
                         user.put("ano", year);
                         user.put("mes", month);
@@ -631,12 +536,8 @@ public class SelectGroup extends AppCompatActivity {
                         int minuto = Calendar.getInstance().getTime().getMinutes();
                         int segundo = Calendar.getInstance().getTime().getSeconds();
                         String currentTime = String.valueOf(ano)+String.valueOf(mes)+String.valueOf(dia)+String.valueOf(hora)+String.valueOf(minuto)+String.valueOf(segundo);
-                        Log.d("CARAI5", currentTime);
                         user.put("cod",currentTime);
                         user.put("color",color);
-
-
-
                         db.collection("users"+MainActivity.getCode())
                                 .add(user)
                                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
@@ -644,14 +545,11 @@ public class SelectGroup extends AppCompatActivity {
                                     public void onSuccess(DocumentReference documentReference) {
                                         Log.d("Carai", "DocumentSnapshot added with ID: " + documentReference.getId());
                                         Toast.makeText(getApplication(), "Evento criado !", Toast.LENGTH_SHORT).show();
-
                                         if (mInterstitialAd.isLoaded()) {
                                             mInterstitialAd.show();
                                         } else {
                                             Log.d("TAG2", "The interstitial wasn't loaded yet.");
                                         }
-
-
                                     }
                                 })
                                 .addOnFailureListener(new OnFailureListener() {
@@ -660,8 +558,6 @@ public class SelectGroup extends AppCompatActivity {
                                         Log.w("Carai", "Error adding document", e);
                                     }
                                 });
-
-
                     }
                 });
         alertDialog.setNegativeButton("Cancelar",
@@ -673,9 +569,6 @@ public class SelectGroup extends AppCompatActivity {
                 });
 
         alertDialog.show();
-
-
-
     }
 
     @Override
@@ -695,13 +588,6 @@ public class SelectGroup extends AppCompatActivity {
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
-                                // Log.d("Carai", document.getId() + " => " + document.getData());
-                                // Log.d("Carai", document.getId() + " => " + document.getData().get("mes"));
-                                // Log.d("Carai", document.getId() + " => " + document.getData().get("dia"));
-                                // Log.d("Carai", document.getId() + " => " + document.getData().get("user"));
-                                //Log.d("Carai", document.getId() + " => " + document.getData().get("cod"));
-                                // Log.d("Carai", document.getId() + " => " + document.getData().get("color"));
-
 
                                 String day = document.getData().get("mes").toString()+document.getData().get("dia").toString();
                                 String message = null;
@@ -716,8 +602,6 @@ public class SelectGroup extends AppCompatActivity {
                                     message += "\n" + document.getData().get("user") +": "+ document.getData().get("message").toString() ;
                                 }
 
-
-
                                 days.put(day, message);
                                 days.put(day+"2", document.getData().get("user").toString());
                                 calendar.markDate(
@@ -731,9 +615,7 @@ public class SelectGroup extends AppCompatActivity {
                         }
                     }
                 });
-        Log.d("Carai3", situacaoDays.toString());
         situacaoDays.clear();
-
 
         db.collection("datas"+MainActivity.getCode())
                 .get()
@@ -742,30 +624,15 @@ public class SelectGroup extends AppCompatActivity {
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
-                                // Log.d("Carai", document.getId() + " => " + document.getData());
-                                // Log.d("Carai3", document.getId() + " => " + document.getData().get("data"));
-                                // Log.d("Carai", document.getId() + " => " + document.getData().get("user"));
-                                // Log.d("Carai", document.getId() + " => " + document.getData().get("situacao"));
-//
-
-
                                 String data = document.getData().get("data").toString();
                                 String user = document.getData().get("user").toString();
                                 String situacao = document.getData().get("situacao").toString();
-
                                 situacaoDays.put(data+";"+user,Integer.valueOf(situacao));
-                                Log.d("Carai4", situacaoDays.toString());
-
-
                             }
                         } else {
                             Log.w("Carai", "Error getting documents.", task.getException());
                         }
                     }
                 });
-
-
-
     }
-
 }

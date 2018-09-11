@@ -1,6 +1,11 @@
 package alves.thiago.agenda;
 
 import android.Manifest;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.TaskStackBuilder;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -8,6 +13,8 @@ import android.graphics.Color;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -17,7 +24,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -26,15 +32,8 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-
-
-import org.apache.commons.io.FileUtils;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -47,13 +46,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-
 public class MainActivity extends AppCompatActivity {
-
-
     CardsAdapter cardsAdapter;
     String Username;
     ListView lvCards;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
         lvCards = findViewById(R.id.lvCards);
         final Intent intent = new Intent(this, SelectGroup.class);
         cardsAdapter = new CardsAdapter(this);
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.VIBRATE,Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
 
 
 
@@ -82,11 +81,6 @@ public class MainActivity extends AppCompatActivity {
             } catch (Exception e) {
             e.printStackTrace();
         }
-
-
-
-
-
         lvCards.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
@@ -95,11 +89,11 @@ public class MainActivity extends AppCompatActivity {
                 setCode(cardsAdapter.getItem(position).getChannel());
                 startActivity(intent);
 
+
+
+
             }});
-
-
         RequestNewGroup();
-
     }
     public void RequestNewGroup(){
         cardsAdapter.clear();
@@ -110,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
         } catch (Exception e) {
 
         }
-        //
+
         try {
             FirebaseFirestore db = FirebaseFirestore.getInstance();
             Log.d("Files",file[0].getName());
@@ -131,9 +125,7 @@ public class MainActivity extends AppCompatActivity {
                         lvCards.setAdapter(cardsAdapter);
                     }
                 });
-
             }
-
         } catch (Exception e) {
 
         }
@@ -148,10 +140,7 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
             Username = null;
         }
-
         if (Username == null){
-
-
 
             AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
             alertDialog.setTitle("Seu nome");
@@ -173,11 +162,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                     });
             alertDialog.show();
-
-
         }
-
-
     }
     public static void deleteFiles(String path) {
 
@@ -300,14 +285,9 @@ public class MainActivity extends AppCompatActivity {
                                 });
                             }
                         } });
-
-
             alertDialog.show();
-
-
-
-
         }
+
         return super.onOptionsItemSelected(item);
     }
     static String code;
@@ -376,12 +356,4 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
-
-
-
-
-
-    }
-
-
-
+}
